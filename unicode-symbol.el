@@ -488,6 +488,7 @@
                                  ("\\smallsetminus" . "∖")
                                  ("\\ast" . "∗")
                                  ("\\circ" . "∘")
+                                 ("\^\\circ" . "∘")
                                  ("\\bullet" . "∙")
                                  ("\\sqrt" . "√")
                                  ("\\sqrt[3]" . "∛")
@@ -2567,16 +2568,35 @@
                                  ("\frac{3}{4}" . "¾")))
 
 
-;; (defun company-simple-backend (command &optional arg &rest ignored)
-;;   (interactive (list 'interactive))
-;;   (cl-case command
-;;     (interactive (company-begin-backend 'company-simple-backend))
-;;     (prefix (when (looking-back "foo\\>")
-;;               (match-string 0)))
-;;     (candidates (when (equal arg "foo")
-;;                   (list "foobar" "foobaz" "foobarbaz")))
-;;     (meta (format "This value is named %s" arg))))
+(defun dwuggh/company-simple-backend (command &optional arg &rest ignored)
+  (interactive (list 'interactive))
+  (cl-case command
+    (interactive (company-begin-backend 'dwuggh/company-simple-backend))
+    (prefix (when (looking-back "\\>")
+              (match-string 0)))
+    (candidates (when (equal arg "fx")
+                  (list "foobar" "foobaz" "foobarbaz")))
+    (meta (format "This value is named %s" arg))))
 
 
+(defun us/find-match (word alist)
+  "find fuzzy matched elements in alist, use word as key
+returns all matches as a list."
+  (let ((match-list nil))
+    (dolist (var alist match-list)
+      (if (string-prefix-p word (car var) 'ignore-case)
+          (setq match-list (cons var match-list)))
+          )))
 
+(defun dwuggh/company-alist-backend (command &optional arg &rest ignored)
+  (interactive (list 'interactive))
+  (cl-case command
+    (interactive (company-begin-backend 'dwuggh/company-alist-backend))
+    (prefix (when (looking-back "\\\\.*\\>")
+              (match-string 0) ))
+    (candidates (mapcar 'cdr (us/find-match arg unicode-symbol-alist)))
+    (annotation (mapcar 'car (us/find-match arg unicode-symbol-alist)))
+    (meta (format "this is a unicode symbol: %s" arg))))
+
+(set (make-local-variable 'company-backends) '(company-backends 'dwuggh/company-alist-backend))
 

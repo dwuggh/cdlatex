@@ -1375,12 +1375,9 @@ zZ
          (setq value (nth level (assoc this-char alist)))
          (if (not value) (setq value ""))))
       ;; use unicode symbol as prompt
-      ;; TODO use assoc only once
       (let ((matched (assoc value unicode-symbol-alist)))
         (if matched
             (setq value (cdr matched))))
-      ;; (if (assoc value unicode-symbol-alist)
-      ;;     (setq value (cdr (assoc value unicode-symbol-alist))))
       (setq this-char (char-to-string this-char)
             value (if (> (length value) 15)
                       (concat (substring value 0 13) "..")
